@@ -205,7 +205,7 @@ public:
 		// Инициализируем начальное состояние
 		State state(init_states);
 		// Рекурсивный перебор состояний
-		exec_next(state, 0, 0, "#");
+		exec_next(state, 0, 0);
 		// Удаляем состояние g.x = 3 && g.y = 0
 		Cell cx("g.x", "3");
 		Cell cy("g.y", "0");
@@ -219,7 +219,7 @@ public:
 	}
 
 	/* Рекурсивный перебор всех возможных состояний */
-	void exec_next(State state, uint countF, uint countG, string prev_h)
+	void exec_next(State state, uint countF, uint countG)
 	{
 		// Добавление состояния в набор
 		state["countF"] = to_string(countF);
@@ -228,14 +228,13 @@ public:
 		// Ячейка таблицы состояний
 		Cell cell;
 		State tmp(state);
-		string h_cur = state["h"];
 		/* Выполнение оператора функции f() */
 		if (countF < this->stateF.size() - 1) {
 			cell = this->stateF[countF];
 			state[cell.key] = cell.value;
 			if ( !this->find(cell) ) // если ячейка впервые - увеличиваем счетчик
 				count[cell.key] += 1;
-			exec_next(state, countF + 1, countG, h_cur);
+			exec_next(state, countF + 1, countG);
 		}
 		
 		/* Выполнение оператора функции g() */
@@ -244,7 +243,7 @@ public:
 			tmp[cell.key] = cell.value;
 			if ( !this->find(cell) ) // если ячейка впервые - увеличиваем счетчик
 				count[cell.key] += 1;
-			exec_next(tmp, countF, countG + 1, h_cur);
+			exec_next(tmp, countF, countG + 1);
 		}    
 	}
 
