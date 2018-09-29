@@ -172,8 +172,8 @@ public:
 
 		// Начальные состояния
 		const map<string, string> init_states = {
-			{"countF", "#"},
-			{"countG", "#"},
+			{"countF", "0"},
+			{"countG", "0"},
 			{"h",   "#"},
 			{"f.x", "#"},
 			{"f.y", "#"},
@@ -205,7 +205,7 @@ public:
 		// Инициализируем начальное состояние
 		State state(init_states);
 		// Рекурсивный перебор состояний
-		exec_next(state, 0, 0);
+		exec_next(state, 0, 0, "#");
 		// Удаляем состояние g.x = 3 && g.y = 0
 		Cell cx("g.x", "3");
 		Cell cy("g.y", "0");
@@ -219,31 +219,32 @@ public:
 	}
 
 	/* Рекурсивный перебор всех возможных состояний */
-	void exec_next(State state, uint countF, uint countG)
+	void exec_next(State state, uint countF, uint countG, string prev_h)
 	{
 		// Добавление состояния в набор
 		state["countF"] = to_string(countF);
 		state["countG"] = to_string(countG);
 		this->states.insert(state);
 		// Ячейка таблицы состояний
-		State temp(state);
 		Cell cell;
+		State tmp(state);
+		string h_cur = state["h"];
 		/* Выполнение оператора функции f() */
 		if (countF < this->stateF.size() - 1) {
 			cell = this->stateF[countF];
 			state[cell.key] = cell.value;
 			if ( !this->find(cell) ) // если ячейка впервые - увеличиваем счетчик
 				count[cell.key] += 1;
-			exec_next(state, countF + 1, countG);
+			exec_next(state, countF + 1, countG, h_cur);
 		}
 		
 		/* Выполнение оператора функции g() */
-		if (countG < temp.stateG.size() - 1) {
-			cell = temp.stateG[countG];
-			temp[cell.key] = cell.value;
-			if ( !temp.find(cell) ) // если ячейка впервые - увеличиваем счетчик
-				temp.count[cell.key] += 1;
-			exec_next(temp, countF, countG + 1);
+		if (countG < this->stateG.size() - 1) {
+			cell = this->stateG[countG];
+			tmp[cell.key] = cell.value;
+			if ( !this->find(cell) ) // если ячейка впервые - увеличиваем счетчик
+				count[cell.key] += 1;
+			exec_next(tmp, countF, countG + 1, h_cur);
 		}    
 	}
 
